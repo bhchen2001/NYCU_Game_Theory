@@ -5,14 +5,14 @@ import matplotlib
 import random
 
 class FictitiousPlay():
-    def __init__(self, gameType, iterTime, numStrategy = 2, numPrev = 5):
+    def __init__(self, gameType, iterTime, numStrategy = 2, numPrev = 1000):
         self.gameType = gameType
         self.iterTime = iterTime
         # fictitious play is designed for game with 2 player
         self.numPlayer = 2
         # the threshold of repeated action
         # if two player repeat the same action for more than actionTh times, stop the iteration
-        self.actionTh = 10000
+        self.actionTh = 3000
         self.numStrategy = numStrategy
         self.numPrev = numPrev
         self.payoffMat = np.zeros([self.numPlayer * self.numStrategy, self.numStrategy])
@@ -123,17 +123,15 @@ class FictitiousPlay():
             # same payoff for each strategy --> choose randomly
             if self.payoffSet[0, iter, 0] == self.payoffSet[0, iter, 1]:
                 action1 = randint(0, 1)
-                self.actionSet[0, iter + 1] = action1
             # different payoff--> choose best response
             else:
                 action1 = int(np.argmax(self.payoffSet[0, iter, :]))
-                self.actionSet[0, iter + 1] = action1
+            self.actionSet[0, iter + 1] = action1
             if self.payoffSet[1, iter, 0] == self.payoffSet[1, iter, 1]:
                 action2 = randint(0, 1)
-                self.actionSet[1, iter + 1] = action2
             else:
                 action2 = int(np.argmax(self.payoffSet[1, iter, :]))
-                self.actionSet[1, iter + 1] = action2
+            self.actionSet[1, iter + 1] = action2
 
             # update the other player's belief
             self.beliefMat[1, self.actionSet[0, iter + 1]] += 1
@@ -142,7 +140,7 @@ class FictitiousPlay():
             if action1 == pre_action1 and action2 == pre_action2:
                 self.actionTh -= 1
                 if self.actionTh == 0:
-                    # print("early stop with repeated best response")
+                    # early stop with repeated best response
                     self.logger(iter, self.actionSet[:, iter], self.beliefMat,
                                 self.payoffSet[:, iter, :], last = True)
                     break

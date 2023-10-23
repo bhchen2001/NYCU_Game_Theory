@@ -151,7 +151,7 @@ The experiment environment is based on
 The \emph{FictitiousPlay} object will be constructed with \emph{gameType} 
 (which game does the user want to simulate by fictitious play model),
 \emph{iterTime} (the number of game round), \emph{numPrev} 
-(the sum of prior belief, means how much rounds does two player already played before round 0),
+(the sum of prior belief, means how much rounds does two players already played before round 0),
 and \emph{actionTh} (threshold for stopping the iteration if two players keep choosing the same best response).
 
 \begin{lstlisting}[language=Python]
@@ -190,6 +190,7 @@ The initial belief can be defined by programmer or assigned randomly.
   def init_belief(self):
     # setup the prior belief of each player
     if self.numPrev == -1:
+      # customize the initial belief
       self.beliefMat = np.array([[500, 500], [500, 500]])
     else:
       playTime = random.uniform(0, self.numPrev)
@@ -198,7 +199,7 @@ The initial belief can be defined by programmer or assigned randomly.
       self.beliefMat[1, :] = [playTime, (self.numPrev - playTime)]
 \end{lstlisting}
 
-The \emph{payoff\_cal} function will calculate the payoff by player's belief and payoff.
+The \emph{payoff\_cal} function will calculate the payoff by player's belief and payoff matrix.
 
 \begin{lstlisting}[language=Python]
   def payoff_cal(self, belief, payoffMat):
@@ -246,7 +247,7 @@ The iteration may be stopped due to the repeated selection of the same best resp
       if action1 == pre_action1 and action2 == pre_action2:
         self.actionTh -= 1
         if self.actionTh == 0:
-          # print("early stop with repeated best response")
+          # early stop with repeated best response
           self.logger(iter, self.actionSet[:, iter], self.beliefMat,
                       self.payoffSet[:, iter, :], last = True)
           break
@@ -265,8 +266,8 @@ The following block shows the result of Q1 by fictitious play,
 for each iteration the program will print out the action, belief and payoff of each player.
 When the game end (or converge), the strategy distribution will be shown,
 which can be use to find the mixed or pure strategy of the game
-(the strategy distribution only considers the actions after round 0, 
-which means the prior belief is ignored).
+(\textbf{the strategy distribution only considers the actions after round 0, 
+which means the prior belief is ignored}).
 
 \begin{lstlisting}
                        Round 0
@@ -422,7 +423,7 @@ so the result will only converge to NE $(r_1, c_1)$.
 \raggedright
 The mixed-strategy NE $P(r_1) = \frac{4}{5}, P(r_2) = \frac{1}{5}, 
 P(c_1) = \frac{1}{2}, P(c_2) = \frac{1}{2}$ can be found by fictitious paly.
-The best response of two player can be analysis by four situation:
+The best response of two players can be analysis by four situation:
 \begin{enumerate}
   \item belief $b_{c1} > b_{c2}, b_{r1} > b_{r2}$, 
   \textbf{player1 will choose $r_2$ as best response}, player2 will choose $c_1$, 
@@ -466,7 +467,7 @@ the mixed-strategy NE can be found by fictitious play.
 
 \begingroup
 \raggedright
-The mixed-strategy NE $P(r_1) = \frac{4}{5}, P(r_2) = \frac{1}{5}, 
+The mixed-strategy NE $P(r_1) = \frac{1}{2}, P(r_2) = \frac{1}{2}, 
 P(c_1) = \frac{1}{2}, P(c_2) = \frac{1}{2}$ can be found by fictitious paly.
 The best response of two player can be analysis by four situation:
 
@@ -536,10 +537,10 @@ the mixed-strategy NE can be found by fictitious play.
 
 \begingroup
 \raggedright
-If the difference of initial payoff is larger than 10 
-($|payoff_{r1} - payoff_{r2}| > 10$ and $|payoff_{c1} - payoff_{c2}| > 10$)
-The pure-strategy NE $(r_1, c_1)$ and $(r_2, c_2)$ can be found by fictitious paly.
-The result will have two situation:
+If the difference of initial payoff is larger than 10
+($|payoff_{r1} - payoff_{r2}| > 10$ and $|payoff_{c1} - payoff_{c2}| > 10$),
+the pure-strategy NE $(r_1, c_1)$ and $(r_2, c_2)$ 
+can be found by fictitious paly. The result will have two situation:
 
 \newpage
 
@@ -579,13 +580,13 @@ The result will have two situation:
 
 \begingroup
 \raggedright
-If the difference of initial payoff is lower than 10 
-($|payoff_{r1} - payoff_{r2}| < 10$ and $|payoff_{c1} - payoff_{c2}| < 10$)
-and initial strategy distribution of two player is 
+If the difference of payoff is always lower than 10 
+($|payoff_{r1} - payoff_{r2}| < 10$ and $|payoff_{c1} - payoff_{c2}| < 10$) 
+during the iteration and strategy distribution of two player is 
 $b_{r1} > b_{r2}, b_{c1} < b_{c2}$  or  $b_{r1} < b_{r2}, b_{c1} > b_{c2}$, 
 the mixed-strategy NE $P(r_1) = \frac{1}{2}, P(r_2) = \frac{1}{2}, 
 P(c_1) = \frac{1}{2}, P(c_2) = \frac{1}{2}$ can be found by fictitious paly.
-Since the best response of each iteration will be lead to the cycle 
+Since the best response of each iteration will be led to the cycle 
 between $(r_1, c_2)$ and $(r_2, c_1)$.
 \endgroup
 
@@ -677,9 +678,9 @@ The result will have two situation:
 
 \begingroup
 \raggedright
-If the difference of initial payoff is lower than 1
-($|payoff_{r1} - payoff_{r2}| < 1$ and $|payoff_{c1} - payoff_{c2}| < 1$)
-and initial strategy distribution of two player is 
+If the difference of initial payoff is always lower than 1
+($|payoff_{r1} - payoff_{r2}| < 1$ and $|payoff_{c1} - payoff_{c2}| < 1$) during iteration
+and strategy distribution of two player is 
 $b_{r1} > b_{r2}, b_{c1} > b_{c2}$  or  $b_{r1} < b_{r2}, b_{c1} < b_{c2}$, 
 the mixed-strategy NE $P(r_1) = \frac{1}{2}, P(r_2) = \frac{1}{2}, 
 P(c_1) = \frac{1}{2}, P(c_2) = \frac{1}{2}$ can be found by fictitious paly.
@@ -737,18 +738,18 @@ between $(r_1, c_1)$ and $(r_2, c_2)$.
 \raggedright
 If the difference of initial payoff is larger than 2
 ($|payoff_{r1} - payoff_{r2}| > 1$ and $|payoff_{c1} - payoff_{c2}| > 1$)
-The pure-strategy NE $(r_1, c_2)$ and $(r_2, c_1)$ can be found by fictitious paly.
+The pure-strategy NE $(r_1, c_1)$ and $(r_2, c_2)$ can be found by fictitious paly.
 The result will have two situation:
 
 \begin{enumerate}
-  \item Once the belief $b_{r1} > b_{r2}, b_{c1} < b_{c2}$,
+  \item Once the belief $b_{r1} > b_{r2}, b_{c1} > b_{c2}$,
   player1 will keep choosing $r_1$ rather than $r_2$, 
-  and player2 will keep choosing $c_2$ rather than $c_1$, 
-  which result in pure-strategy NE $(r_1, c_2)$.
-  \item Once the belief $b_{r1} < b_{r2}, b_{c1} > b_{c2}$,
-  player1 will keep choosing $r_2$ rather than $r_1$, 
   and player2 will keep choosing $c_1$ rather than $c_2$, 
-  which result in pure-strategy NE $(r_2, c_1)$.
+  which result in pure-strategy NE $(r_1, c_1)$.
+  \item Once the belief $b_{r1} < b_{r2}, b_{c1} < b_{c2}$,
+  player1 will keep choosing $r_2$ rather than $r_1$, 
+  and player2 will keep choosing $c_2$ rather than $c_1$, 
+  which result in pure-strategy NE $(r_2, c_2)$.
 \end{enumerate}
 \endgroup
 
@@ -775,8 +776,8 @@ The result will have two situation:
 \begingroup
 \raggedright
 If the difference of initial payoff is lower than 2
-($|payoff_{r1} - payoff_{r2}| < 2$ and $|payoff_{c1} - payoff_{c2}| < 2$)
-and initial strategy distribution of two player is 
+($|payoff_{r1} - payoff_{r2}| < 2$ and $|payoff_{c1} - payoff_{c2}| < 2$) during iteration
+and strategy distribution of two player is 
 $b_{r1} > b_{r2}, b_{c1} < b_{c2}$  or  $b_{r1} < b_{r2}, b_{c1} > b_{c2}$, 
 the mixed-strategy NE $P(r_1) = \frac{3}{5}, P(r_2) = \frac{2}{5}, 
 P(c_1) = \frac{2}{5}, P(c_2) = \frac{3}{5}$ can be found by fictitious paly.
@@ -832,9 +833,9 @@ between $(r_1, c_2)$ and $(r_2, c_1)$.
 
 \begingroup
 \raggedright
-If the difference of payoff during the iteration will always larger than 1
+If the difference of initial payoff is larger than 1
 ($|payoff_{r1} - payoff_{r2}| > 1$ and $|payoff_{c1} - payoff_{c2}| > 1$)
-The pure-strategy NE $(r_1, c_2)$ and $(r_2, c_1)$ can be found by fictitious paly.
+The pure-strategy NE $(r_1, c_1)$ and $(r_2, c_2)$ can be found by fictitious paly.
 The result will have two situation:
 
 \begin{enumerate}
@@ -873,8 +874,8 @@ The result will have two situation:
 \begingroup
 \raggedright
 If the difference of initial payoff is lower than 1
-($|payoff_{r1} - payoff_{r2}| < 1$ and $|payoff_{c1} - payoff_{c2}| < 1$)
-and initial strategy distribution of two player is 
+($|payoff_{r1} - payoff_{r2}| < 1$ and $|payoff_{c1} - payoff_{c2}| < 1$) during iteration
+and strategy distribution of two player is 
 $b_{r1} > b_{r2}, b_{c1} < b_{c2}$  or  $b_{r1} < b_{r2}, b_{c1} > b_{c2}$, 
 the mixed-strategy NE $P(r_1) = \frac{1}{2}, P(r_2) = \frac{1}{2}, 
 P(c_1) = \frac{1}{2}, P(c_2) = \frac{1}{2}$ can be found by fictitious paly.
@@ -887,10 +888,10 @@ between $(r_1, c_2)$ and $(r_2, c_1)$.
 \begin{enumerate}
   \item Fictitious play may cannot find some pure-strategy NE.
   Take Q3's game matrix for example, fictitious play cannot find the NE $(r_2, c_2)$
-  since the action of two player will always converge to $(r_1, c_1)$
+  since the action of two player will always converge to $(r_1, c_1)$.
   \item Fictitious play may cannot find some mixed-strategy NE.
   If the user has no prior knowledge to setup the initial belief for specific mixed-strategy NE,
-  the fictitious play will not converge to mixed-strategy NE.
+  the fictitious play may not converge to mixed-strategy NE.
 \end{enumerate}
 
 % \begin{figure*}[tbh]
