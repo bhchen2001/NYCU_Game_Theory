@@ -54,17 +54,20 @@ class gameModel():
         # initialize the strategy of each node
         for node in self.graph.nodes():
             self.graph.nodes[node]['strategy'] = random.randint(0, 1)
+            
 
     def weighted_MIS(self):
         self.init_node_MIS()
-        print("=====================================")
-        print("Initial State:")
-        print("weight: ", nx.get_node_attributes(self.graph, 'weight'))
-        print("priority: ", nx.get_node_attributes(self.graph, 'priority'))
-        print("strategy: ", nx.get_node_attributes(self.graph, 'strategy'))
-        print("=====================================")
-        print("Start playing the game...")
-        print("=====================================")
+
+        if not __debug__:
+            print("=====================================")
+            print("Initial State:")
+            print("weight: ", nx.get_node_attributes(self.graph, 'weight'))
+            print("priority: ", nx.get_node_attributes(self.graph, 'priority'))
+            print("strategy: ", nx.get_node_attributes(self.graph, 'strategy'))
+            print("=====================================")
+            print("Start playing the game...")
+            print("=====================================")
         round = 0
         while True:
             # check if there are nodes can change the strategy
@@ -87,13 +90,15 @@ class gameModel():
             node_to_change = random.choice(candidate_nodes)
             # change the strategy of the node
             self.graph.nodes[node_to_change]['strategy'] = 1 - self.graph.nodes[node_to_change]['strategy']
-            print("Change the strategy of node {} to {}".format(node_to_change, self.graph.nodes[node_to_change]['strategy']))
-            print("Strategy in round {}: ".format(round), nx.get_node_attributes(self.graph, 'strategy'))
-            print("=====================================")
+            if not __debug__:
+                print("Change the strategy of node {} to {}".format(node_to_change, self.graph.nodes[node_to_change]['strategy']))
+                print("Strategy in round {}: ".format(round + 1), nx.get_node_attributes(self.graph, 'strategy'))
+                print("=====================================")
             round += 1
-        print("reach NE")
-        print("Total weight sum in MIS:", sum(nx.get_node_attributes(self.graph, 'weight').values()))
-        print("Cardinality of MIS:", sum(nx.get_node_attributes(self.graph, 'strategy').values()))
+        if not __debug__:
+            print("reach NE")
+            print("Total weight sum in MIS:", sum(nx.get_node_attributes(self.graph, 'weight').values()))
+            print("Cardinality of MIS:", sum(nx.get_node_attributes(self.graph, 'strategy').values()))
         cardinality = sum(nx.get_node_attributes(self.graph, 'strategy').values())
 
         return cardinality
@@ -102,66 +107,80 @@ class gameModel():
         # initialize the strategy of each node
         for node in self.graph.nodes():
             self.graph.nodes[node]['strategy'] = random.randint(0, 1)
+            # for specific case
+            # if (node - 2) % 3 == 0:
+            #     self.graph.nodes[node]['strategy'] = 1
+            # else:
+            #     self.graph.nodes[node]['strategy'] = 0
 
-        print("=====================================")
-        print("Initial State:")
-        print("strategy: ", nx.get_node_attributes(self.graph, 'strategy'))
-        print("=====================================")
-        print("Start playing the game...")
-        print("=====================================")
+        if not __debug__:
+            print("=====================================")
+            print("Initial State:")
+            print("strategy: ", nx.get_node_attributes(self.graph, 'strategy'))
+            print("=====================================")
+            print("Start playing the game...")
+            print("=====================================")
         round = 0
         while True:
             # check if there are nodes can change the strategy
             candidate_nodes = []
             for node in self.graph.nodes():
                 current_strategy = self.graph.nodes[node]['strategy']
+                
+                br = 1
+
                 independence_flag = 0
-                # if violate the independence
-                for neighbor in self.graph.neighbors(node):
-                    neighbor_strategy = self.graph.nodes[neighbor]['strategy']
-                    if neighbor_strategy == 1:
-                        independence_flag = 1
-                        break
-                # check the domination of each neighbor
                 domination_flag = 1
                 v = 0
+                # check the independence of the node
                 for neighbor in self.graph.neighbors(node):
+                    if self.graph.nodes[neighbor]['strategy'] == 1:
+                        independence_flag = 1
+                        break
                     v += self.graph.nodes[neighbor]['strategy']
-                if v == 0:
-                    domination_flag = 0
-                else:
-                    for neighbor in self.graph.neighbors(node):
-                        v = 0
-                        for neighbor_neighbor in self.graph.neighbors(neighbor):
-                            v += self.graph.nodes[neighbor_neighbor]['strategy']
-                        if v == 0:
-                            domination_flag = 0
-                            break
-                if independence_flag or domination_flag:
+                if independence_flag == 1:
                     br = 0
                 else:
-                    br = 1
+                    # check whether the node and its neighbors are already dominated or not
+                    if v == 0:
+                        domination_flag = 0
+                    else:
+                        for neighbor in self.graph.neighbors(node):
+                            v = self.graph.nodes[neighbor]['strategy']
+                            for neighbor_neighbor in self.graph.neighbors(neighbor):
+                                v += self.graph.nodes[neighbor_neighbor]['strategy']
+                            if v == 0:
+                                domination_flag = 0
+                                break
+                    if domination_flag:
+                        br = 0
+
                 if current_strategy != br:
                     candidate_nodes.append(node)
             if len(candidate_nodes) == 0:
                 break
+            if not __debug__:
+                print("Candidate nodes: ", candidate_nodes)
             # randomly choose a node from candidate nodes
             node_to_change = random.choice(candidate_nodes)
             # change the strategy of the node
             self.graph.nodes[node_to_change]['strategy'] = 1 - self.graph.nodes[node_to_change]['strategy']
-            print("Change the strategy of node {} to {}".format(node_to_change, self.graph.nodes[node_to_change]['strategy']))
-            print("Strategy in round {}: ".format(round), nx.get_node_attributes(self.graph, 'strategy'))
-            print("=====================================")
+            if not __debug__:
+                print("Change the strategy of node {} to {}".format(node_to_change, self.graph.nodes[node_to_change]['strategy']))
+                print("Strategy in round {}: ".format(round + 1), nx.get_node_attributes(self.graph, 'strategy'))
+                print("=====================================")
             round += 1
-        print("reach NE")
-        print("Cardinality of MDS-based IDS:", sum(nx.get_node_attributes(self.graph, 'strategy').values()))
+        if not __debug__:
+            print("reach NE")
+            print("Cardinality of MDS-based IDS:", sum(nx.get_node_attributes(self.graph, 'strategy').values()))
         cardinality = sum(nx.get_node_attributes(self.graph, 'strategy').values())
 
         return cardinality
 
     def process(self):
         self.init_graph()
-        self.graph_details()
+        if not __debug__:
+            self.graph_details()
         if self.game_type == 'Weighted MIS':
             cardinality = self.weighted_MIS()
             print("Requirement 1-1:")
@@ -180,7 +199,7 @@ if __name__ == '__main__':
     num_node = int(sys.argv[1])
     link_list = [link for link in sys.argv[2:]]
 
-    # my_game = gameModel(num_node, link_list, 'Weighted MIS')
-    # my_game.process()
-    my_game = gameModel(num_node, link_list, 'Symmetric MDS-based IDS')
-    my_game.process()
+    my_MIS_game = gameModel(num_node, link_list, 'Weighted MIS')
+    my_MIS_game.process()
+    my_IDS_game = gameModel(num_node, link_list, 'Symmetric MDS-based IDS')
+    my_IDS_game.process()
